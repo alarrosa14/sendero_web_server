@@ -7,4 +7,8 @@ io.on('connection', function(client){
     console.log("Client connected...");
 });
 
+app.get('/',function(req,res){
+	res.sendFile(__dirname + '/index.html');
+});
+
 server.listen(8080);
