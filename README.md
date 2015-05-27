@@ -1,4 +1,4 @@
-# sendero_web_server
+# Sendero Web Server Prototype
 
 This prototype shows how to connect NodeJS-Socket.IO with C++ using [Socket.IO C++](https://github.com/socketio/socket.io-client-cpp).
 
