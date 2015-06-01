@@ -7,4 +7,7 @@ Dependencies:
 [boost](http://www.boost.org/)
 [websocketpp++](https://github.com/zaphoyd/websocketpp)
 
+Compilación: 
+g++ -L./ -lsioclient -lboost_system-mt -lboost_random-mt -lboost_date_time-mt -o senderoTest cplusplus_client.cpp
+
 Work in progress...
