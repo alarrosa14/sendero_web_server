@@ -4,8 +4,9 @@
   "description": "Web server for Sendero project.",
   "main": "sendero_server.js",
   "dependencies": {
+    "express": "^4.12.4",
     "socket.io": "^1.3.5",
-    "express": "^4.12.4"
+    "socket.io-stream": "^0.8.0"
   },
   "devDependencies": {},
   "scripts": {
