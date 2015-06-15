@@ -4,7 +4,7 @@
 //  Created by Melo Yao on 3/24/15.
 //
 
-#include "sio_client.h"
+#include "./include/sio_client.h"
 
 #include <functional>
 #include <iostream>
@@ -21,7 +21,7 @@ using namespace std;
 int main(int argc ,const char* args[]){
 
     sio::client h;
-    h.connect("http://192.168.0.103:8080");
+    h.connect("http://localhost:8080");
 
     // Open file
     std::ifstream ifs;
