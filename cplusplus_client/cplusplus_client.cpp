@@ -4,7 +4,7 @@
 //  Created by Melo Yao on 3/24/15.
 //
 
-#include "./include/sio_client.h"
+#include "include/sio_client.h"
 
 #include <functional>
 #include <iostream>
@@ -25,8 +25,8 @@ int main(int argc ,const char* args[]){
 
     // Open file
     std::ifstream ifs;
-    ifs.open("package.json", std::ifstream::in);
-    ifs.seekg(0,ifs.end);
+    ifs.open("elarchivo.jpg", std::ifstream::in);
+    ifs.seekg(0, ifs.end);
     int length = ifs.tellg();
     char* buf = new char[length];
     ifs.seekg(0,ifs.beg);
