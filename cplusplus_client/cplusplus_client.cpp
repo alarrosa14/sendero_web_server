@@ -25,7 +25,7 @@ int main(int argc ,const char* args[]){
 
     // Open file
     std::ifstream ifs;
-    ifs.open("elarchivo.jpg", std::ifstream::in);
+    ifs.open("/home/alarrosa14/node/sendero_web_server/cplusplus_client/elarchivo.jpg", std::ifstream::in);
     ifs.seekg(0, ifs.end);
     int length = ifs.tellg();
     char* buf = new char[length];

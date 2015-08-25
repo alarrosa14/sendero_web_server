@@ -16,12 +16,18 @@
 <script>
   var server = io.connect('http://localhost:8080');
 
-  server.on('pete', function(what){
-  	console.log(what);
+  server.on('frame', function(what){
+  	var bufView = new Uint8Array(what);
+  	var R = bufView[0];
+  	var G = bufView[1];
+  	var B = bufView[2];
+
+    document.body.style.backgroundColor= 'rgb(' + R + ',' + G + ',' + B + ')';
+  	console.log(bufView);
   });
 
   function f(){
-  	server.emit("pete", "acabada");
+  	server.emit("file_upload", "");
   }
 
 </script>
