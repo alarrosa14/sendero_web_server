@@ -7,11 +7,12 @@
 
 <body>
 
-<p>This is the first paragraph in the body of your new HTML file!</p>
-<button onclick="f()">BOTON</button>
+
+
 </body>
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="/paper/dist/paper-node.js"></script>
 
 <script>
   var server = io.connect('http://192.168.0.100:8080');
@@ -27,7 +28,7 @@
   });
 
   function f(){
-  	server.emit("file_upload", "");
+  	server.emit("sendFrame", "");
   }
 
 </script>

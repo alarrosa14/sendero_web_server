@@ -1,0 +1,29 @@
+{
+  "name": "webSenderoClient",
+  "version": "0.0.0",
+  "homepage": "https://github.com/alarrosa14/sendero_web_server",
+  "authors": [
+    "Alvaro Larrosa <alarrosa14@gmail.com>"
+  ],
+  "description": "A web Sendero client that uses Paper.js, Express and Socket.io",
+  "main": "app.js",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "sendero",
+    "paper",
+    "express"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper": "~0.9.24"
+  }
+}
