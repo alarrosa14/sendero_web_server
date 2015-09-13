@@ -24,6 +24,7 @@
     "tests"
   ],
   "dependencies": {
-    "paper": "~0.9.24"
+    "paper": "~0.9.24",
+    "three.js": "~0.71.0"
   }
 }
