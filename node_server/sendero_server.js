@@ -4,6 +4,9 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
 var path = require('path');
+
+app.use(express.static(path.join(__dirname, 'public')));
+
 require('socket.io-stream')(io);
 
 io.on('connection', function(client){

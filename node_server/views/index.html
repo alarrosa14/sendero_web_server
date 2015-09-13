@@ -6,30 +6,81 @@
 </head>
 
 <body>
-
-
-
 </body>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="/paper/dist/paper-node.js"></script>
+<script src="three.min.js"></script>
+<script src="http://threejs.org/examples/js/loaders/OBJLoader.js"></script>
+<script src="http://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
+<script src="three.helper.js"></script>
+<script src="xml.parser.js"></script>
 
 <script>
+
+  
+
   var server = io.connect('http://192.168.0.100:8080');
 
-  server.on('frame', function(what){
-  	var bufView = new Uint8Array(what);
-  	var R = bufView[0];
-  	var G = bufView[1];
-  	var B = bufView[2];
+  initThree();
 
-    document.body.style.backgroundColor= 'rgb(' + R + ',' + G + ',' + B + ')';
-  	console.log(bufView);
-  });
+  pixels = loadPixelsFromXML('serverConf.xml');
 
-  function f(){
-  	server.emit("sendFrame", "");
-  }
+
+  // esto no esta andando, o sea,
+  // por ahora no se puede cambiar el color de los pixeles en runtime
+  console.log('pixeeels ' + pixels.length)
+
+  for (var i = 0; i < pixels.length; i++) {
+    o = pixels[i];
+    console.log(o)
+    changePixelColor(o,Math.random()*255,Math.random()*255,Math.random()*255);
+  };
+
+  animate();
+  render();
+
+  i = -1;
+
+  // changeColor = function(){
+    
+  //   console.log('hola')
+  //   i = (i+1)%pixels.length;
+
+  //   object = pixels[i]
+
+
+  //   changePixelColor(object,Math.random()*255,Math.random()*255,Math.random()*255);
+  // }
+
+  // function runner() {
+  //     changeColor();
+  //     render();
+  //     setTimeout(function() {
+  //         runner();
+  //     }, 500);
+  // }
+
+  // runner();
+
+
+  
+
+  // document.body.style.backgroundColor= 'rgb(128,128,128)';
+  
+  // server.on('frame', function(what){
+  //  var bufView = new Uint8Array(what);
+  //  var R = bufView[0];
+  //  var G = bufView[1];
+  //  var B = bufView[2];
+
+  //   document.body.style.backgroundColor= 'rgb(' + R + ',' + G + ',' + B + ')';
+  //  console.log(bufView);
+  // });
+
+  // function f(){
+  //  server.emit("sendFrame", "");
+  // }
 
 </script>
 
