@@ -67,7 +67,7 @@ function changePixelColor(object,r,g,b){
 	});
 }
 
-function addObject(objModel, position, up, front, RGBColor){
+function addObject(objModel, position, up, front, RGBColor, objectGetter){
 
 	var onProgress = function ( xhr ) {
 	  if ( xhr.lengthComputable ) {
@@ -88,8 +88,10 @@ function addObject(objModel, position, up, front, RGBColor){
 	};
 
 	var loader = new THREE.OBJLoader( manager );
-	obj = null;
-	loader.load( objModel , obj = function ( object ) {
+
+	/////////////////////////////////////
+	var obj;
+	loader.load( objModel , function ( object ) {
 
 	  object.traverse( function ( child ) {
 
@@ -102,8 +104,6 @@ function addObject(objModel, position, up, front, RGBColor){
 
 	  } );
 
-
-	  // object.position = position;
 	  object.position.set(position.x,position.y,position.z);
 	  object.up = up;
 	  object.lookAt(front);
@@ -114,12 +114,11 @@ function addObject(objModel, position, up, front, RGBColor){
 	  
 	  scene.add( object );
 
-	  return object
-
+	  objectGetter(object);
 	}, onProgress, onError );
 
 	console.log('en addObj: ' + obj);
-	return obj;
+	/////////////////////////////////////////
 }
 
 function onWindowResize() {

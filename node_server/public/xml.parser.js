@@ -7,9 +7,9 @@ function tagToVector3(tag){
 	return vect
 }
 
-function loadPixelsFromXML(xmlPath){
+function loadPixelsFromXML(xmlPath, callBack){
 
-  pixelsList = [];
+  var pixelsList = [];
 
   if (window.XMLHttpRequest)
   {// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -22,35 +22,45 @@ function loadPixelsFromXML(xmlPath){
 
   xmlhttp.open("GET",xmlPath,false);
   xmlhttp.send();
-  xmlDoc=xmlhttp.responseXML;
+  var xmlDoc=xmlhttp.responseXML;
   
   console.log(xmlDoc);
 
-  pixelsDoc = xmlDoc.getElementsByTagName("Pixel")
+  var pixelsDoc = xmlDoc.getElementsByTagName("Pixel")
+  var pixelsQty = pixelsDoc.length
+
+  var loaderFunction = function(object){
+  	pixelsList.push(object);
+  	console.log("adding pixel...");
+  	if (pixelsList.length == pixelsQty){
+  		console.log("calling callback");
+  		callBack(pixelsList);
+  	}
+  }
+
   for (var i = 0; i < pixelsDoc.length; i++) {
     
-    pixel = pixelsDoc[i]
-    R = parseInt(pixel.getAttribute('r'))
-    G = parseInt(pixel.getAttribute('g'))
-    B = parseInt(pixel.getAttribute('b'))
+    var pixel = pixelsDoc[i]
+    var R = parseInt(pixel.getAttribute('r'))
+    var G = parseInt(pixel.getAttribute('g'))
+    var B = parseInt(pixel.getAttribute('b'))
 
-    color = (R << 16) | (G << 8) | B;
+    var color = (R << 16) | (G << 8) | B;
     
-    renderTag = pixel.getElementsByTagName('Render')[0]
+    var renderTag = pixel.getElementsByTagName('Render')[0]
 
-    objectModelName = renderTag.getAttribute('mesh')
+    var objectModelName = renderTag.getAttribute('mesh')
     
-    frontTag = renderTag.getElementsByTagName('Front')[0]
-    upTag = renderTag.getElementsByTagName('Up')[0]
-    positionTag = renderTag.getElementsByTagName('Position')[0]
+    var frontTag = renderTag.getElementsByTagName('Front')[0]
+    var upTag = renderTag.getElementsByTagName('Up')[0]
+    var positionTag = renderTag.getElementsByTagName('Position')[0]
     
-    front = tagToVector3(frontTag);
-    up = tagToVector3(upTag);
-    position = tagToVector3(positionTag);
+    var front = tagToVector3(frontTag);
+    var up = tagToVector3(upTag);
+    var position = tagToVector3(positionTag);
 
-    pixelsList.push(addObject(objectModelName + '100.obj',position,up,front,color));
+    addObject(objectModelName + '100.obj',position,up,front,color,loaderFunction);
 
   };
 
-  return pixelsList;
 }
