@@ -10,8 +10,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 require('socket.io-stream')(io);
 
 io.on('connection', function(client){
-  console.log("Connected client... NUEVO");
-  console.log("EL CLIENTE: ", client);
+  console.log("Connected client...");
   client.on('sendFrame', function(data){
     client.broadcast.emit('frame', data);
   });

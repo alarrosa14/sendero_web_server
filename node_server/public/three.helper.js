@@ -32,17 +32,17 @@ function initThree() {
   // scene.add( directionalLight );
 
 
-  renderer = new THREE.WebGLRenderer();
+  renderer = new THREE.WebGLRenderer({ antialias: true, precision: 'highp', alpha: true });
+  renderer.setClearColor( 0x212121, 1);
   renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setSize( window.innerWidth, window.innerHeight );
-  renderer.antialias = true;
   container.appendChild( renderer.domElement );
 
   stats = new Stats();
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.top = '0px';
   stats.domElement.style.zIndex = 100;
-  container.appendChild( stats.domElement );
+  //container.appendChild( stats.domElement );
 
   // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
