@@ -61,7 +61,7 @@ function changePixelColor(object,r,g,b){
     if ( child instanceof THREE.Mesh ) {
 
       // child.material.map = texture;
-      var material = new THREE.MeshBasicMaterial( { color: colorRGB } );
+      var material = new THREE.MeshBasicMaterial( { color: colorRGB, side: THREE.DoubleSide } );
       child.material = material;
 
     }
