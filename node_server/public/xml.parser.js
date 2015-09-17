@@ -1,10 +1,8 @@
 function tagToVector3(tag){
-	vect = new THREE.Vector3();
-	x = parseFloat(tag.getAttribute('x'));
-	y = parseFloat(tag.getAttribute('y'));
-	z = parseFloat(tag.getAttribute('z'));
-	vect.set(x,y,z);
-	return vect
+  var x = parseFloat(tag.getAttribute('x'));
+  var y = parseFloat(tag.getAttribute('y'));
+  var z = parseFloat(tag.getAttribute('z'));
+	return new THREE.Vector3(x,y,z);
 }
 
 function loadPixelsFromXML(xmlPath, callBack){
@@ -58,6 +56,15 @@ function loadPixelsFromXML(xmlPath, callBack){
     var front = tagToVector3(frontTag);
     var up = tagToVector3(upTag);
     var position = tagToVector3(positionTag);
+
+    var print = function(vect){
+      return '(' + vect.x + ',' + vect.y + ',' + vect.z + ')';
+    }
+
+    console.log('Pixel ' + i);
+    console.log('front ' + print(front));
+    console.log('up ' + print(up));
+    console.log('position ' + print(position));
 
     addObject(objectModelName + '100.obj',position,up,front,color,loaderFunction);
 
