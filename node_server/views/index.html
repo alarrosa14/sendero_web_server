@@ -70,19 +70,16 @@
     function changePixelColor(object,r,g,b){
 
       colorRGB = (r << 16) | (g << 8) | b;
-      // object.material.color.setHex(colorRGB);
       object.traverse( function ( child ) {
 
         if ( child instanceof THREE.Mesh ) {
-          // child.material.map = texture;
-          var material = new THREE.MeshBasicMaterial( { color: colorRGB, side: THREE.DoubleSide } );
-          child.material = material;
+          child.material.color.set(colorRGB);
         }
       });
     }
 
     function init() {
-      renderer = new THREE.WebGLRenderer();
+      renderer = new THREE.WebGLRenderer({antialias: true});
       element = renderer.domElement;
       container = document.getElementById('example');
       container.appendChild(element);
