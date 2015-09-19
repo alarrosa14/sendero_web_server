@@ -38,15 +38,25 @@
     var camera, scene, renderer;
     var effect, controls;
     var element, container;
-    var server = io.connect('http://alarrosa14.ddns.net:8080');
+    var server = io.connect('192.168.0.120:8080');
 
     var clock = new THREE.Clock();
 
+    var play = new THREE.Object3D();
+   
+
     init();
+
+    scene.add(play);
 
     fullscreen();
 
     loadPixelsFromXML('serverConf.xml', function(pixels){
+
+
+      for (var i = 0; i < pixels.length; i++) {
+        play.add(pixels[i])
+      };
 
       animate();
       render();
@@ -66,6 +76,31 @@
       });
 
     });
+
+    function onDeviceOrientationChangeEvent(evt) {
+
+      if (!evt.alpha) {
+          return;
+      }
+
+      var deviceOrientation = evt;
+      var tis = {};
+      tis.alpha = deviceOrientation.gamma ?
+        THREE.Math.degToRad(deviceOrientation.alpha) : 0; // Z,  Y
+      tis.beta = deviceOrientation.beta ?
+        THREE.Math.degToRad(deviceOrientation.beta) : 0; // X', Z
+      tis.gamma = deviceOrientation.gamma ?
+        THREE.Math.degToRad(deviceOrientation.gamma) : 0; // Y'', X
+
+
+      play.quaternion.setFromEuler(new THREE.Euler(-tis.gamma - Math.PI/2, -tis.alpha, 0, 'XYZ'));
+      // camera.quaternion.setFromEuler(new THREE.Euler(tis.gamma, tis.beta, tis.alpha, 'YXZ'));
+      // camera.updateProjectionMatrix();
+
+
+    }
+
+    window.addEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
 
     function changePixelColor(object,r,g,b){
 
@@ -93,21 +128,23 @@
       scene.add(camera);
 
       controls = new THREE.OrbitControls(camera, element);
-      controls.rotateUp(Math.PI / 4);
-      controls.target.set(
-        camera.position.x + 0.1,
-        camera.position.y,
-        camera.position.z
-      );
-      controls.noZoom = true;
-      controls.noPan = true;
+      // controls.rotateUp(Math.PI / 4);
+      // controls.target.set(
+      //   camera.position.x + 0.1,
+      //   camera.position.y,
+      //   camera.position.z
+      // );
+      // controls.noZoom = true;
+      // controls.noPan = true;
 
       function setOrientationControls(e) {
         if (!e.alpha) {
           return;
         }
 
-        controls = new THREE.DeviceOrientationControls(camera, true);
+        cam = new THREE.PerspectiveCamera();
+
+        controls = new THREE.DeviceOrientationControls(cam, true);
         controls.connect();
         controls.update();
 
@@ -115,7 +152,7 @@
 
         window.removeEventListener('deviceorientation', setOrientationControls, true);
       }
-      window.addEventListener('deviceorientation', setOrientationControls, true);
+      //window.addEventListener('deviceorientation', setOrientationControls, true);
 
 
       var light = new THREE.HemisphereLight(0x777777, 0x000000, 0.6);
@@ -141,7 +178,9 @@
 
       var mesh = new THREE.Mesh(geometry, material);
       mesh.rotation.x = -Math.PI / 2;
-      //scene.add(mesh);
+      mesh.position.set(0,-100,0);
+      play.add(mesh);
+      // scene.add(mesh);
 
       window.addEventListener('resize', resize, false);
       setTimeout(resize, 1);
@@ -205,7 +244,7 @@
 
       object.position.set(position.x,position.y,position.z);
 
-      scene.add( object );
+      // scene.add( object );
 
       objectGetter(object);
       }, onProgress, onError );
@@ -303,6 +342,37 @@
     }
 
     function render(dt) {
+
+      // function translate(obj,vect){
+      //   obj.translateX(vect.x);
+      //   obj.translateY(vect.y);
+      //   obj.translateZ(vect.z);
+      // }
+      // var inv = camera.quaternion;
+
+      // // inv.x = -inv.x;
+      // // inv.y = -inv.y;
+      // // inv.z = -inv.z;
+      // // inv.w = -inv.w;
+      // for (var i = 0; i < scene.children.length; i++) {
+      //   var obj = scene.children[i];
+
+      //   var x = obj.position.x;
+      //   var y = obj.position.y;
+      //   var z = obj.position.z;
+
+      //   // translate(obj,{x:-x,y:-y,z:-z});
+      //   obj.position.set(camera.position.x,camera.position.y,camera.position.z);
+
+      //   obj.setRotationFromQuaternion(inv);
+
+      //   translate(obj,{x:x,y:y,z:z});
+      // };
+
+
+      var lookAtVector = new THREE.Vector3(0,0, -1);
+      lookAtVector.applyQuaternion(camera.quaternion);
+
       effect.render(scene, camera);
     }
 
