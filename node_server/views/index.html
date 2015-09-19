@@ -40,6 +40,12 @@
     var element, container;
     var server = io.connect('http://alarrosa14.ddns.net:8080');
 
+    /************************************************************/
+    /* Interactions */
+    var socket = io.connect('http://localhost:8080');
+    socket.emit('interaction', { my: 'Interaction from Client' });
+    /************************************************************/
+
     var clock = new THREE.Clock();
 
     init();
