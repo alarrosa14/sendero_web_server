@@ -3,6 +3,7 @@
   <head>
     <title>Cardboard Example</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
       body {
@@ -35,7 +36,7 @@
   <script src="DeviceOrientationControls.js"></script>
 
   <script>
-    var camera, scene, renderer;
+    var camera, scene, renderer, play;
     var effect, controls;
     var element, container;
     var server = io.connect('http://alarrosa14.ddns.net:8080');
@@ -52,9 +53,9 @@
       render();
 
       server.on('frame', function(what){
-      var bufView = new Uint8Array(what);
+        var bufView = new Uint8Array(what);
 
-      for (var i = 0; i < 3*90; i =  i + 3) {
+        for (var i = 0; i < 3*90; i =  i + 3) {
           var R = bufView[i];
           var G = bufView[i+1];
           var B = bufView[i+2]; 
@@ -79,18 +80,52 @@
     }
 
     function init() {
-      renderer = new THREE.WebGLRenderer({antialias: true});
+      renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+      renderer.setClearColor( 0x212121 , 1);
       element = renderer.domElement;
       container = document.getElementById('example');
       container.appendChild(element);
 
       effect = new THREE.StereoEffect(renderer);
 
+      play = new THREE.Object3D();
+
       scene = new THREE.Scene();
 
+
+      var debugaxis = function(axisLength){
+          //Shorten the vertex function
+          function v(x,y,z){
+                  return new THREE.Vector3(x,y,z); 
+          }
+          
+          //Create axis (point1, point2, colour)
+          function createAxis(p1, p2, color){
+                  var line, lineGeometry = new THREE.Geometry(),
+                  lineMat = new THREE.LineBasicMaterial({color: color, lineWidth: 1});
+                  lineGeometry.vertices.push(p1, p2);
+                  line = new THREE.Line(lineGeometry, lineMat);
+
+                  scene.add(line);
+          }
+          
+          createAxis(v(-axisLength, 0, 0), v(axisLength, 0, 0), 0xFF0000);
+          createAxis(v(0, -axisLength, 0), v(0, axisLength, 0), 0x00FF00);
+          createAxis(v(0, 0, -axisLength), v(0, 0, axisLength), 0x0000FF);
+      };
+
+      //To use enter the axis length
+      debugaxis(1000);
+
+
+      scene.add(play);
+
+
+
+
       camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
-      camera.position.set(0, 10, -200);
-      scene.add(camera);
+      camera.position.set(0, 0, -200);
+      play.add(camera);
 
       controls = new THREE.OrbitControls(camera, element);
       controls.rotateUp(Math.PI / 4);
@@ -107,9 +142,8 @@
           return;
         }
 
-        controls = new THREE.DeviceOrientationControls(camera, true);
+        controls = new THREE.DeviceOrientationControls(play);
         controls.connect();
-        controls.update();
 
         element.addEventListener('click', fullscreen, false);
 
@@ -141,7 +175,10 @@
 
       var mesh = new THREE.Mesh(geometry, material);
       mesh.rotation.x = -Math.PI / 2;
-      //scene.add(mesh);
+      mesh.position.set(0,-90,0);
+
+      //play.add(mesh);
+      scene.add(mesh);
 
       window.addEventListener('resize', resize, false);
       setTimeout(resize, 1);
@@ -206,6 +243,7 @@
       object.position.set(position.x,position.y,position.z);
 
       scene.add( object );
+      //play.add(object);
 
       objectGetter(object);
       }, onProgress, onError );
