@@ -14,6 +14,9 @@ io.on('connection', function(client){
   client.on('sendFrame', function(data){
     client.broadcast.emit('frame', data);
   });
+  client.on('log', function(msj){
+  	console.log(msj);
+  });
 });
 
 app.get('/', function(req, res){
