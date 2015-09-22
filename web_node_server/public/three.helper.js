@@ -1,8 +1,5 @@
 var container, stats;
-
 var camera, controls, scene, renderer;
-
-var mouseX = 0, mouseY = 0;
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
@@ -10,7 +7,7 @@ var windowHalfY = window.innerHeight / 2;
 /*** Intersection ***/
 var raycaster;
 var mouse;
-var objects = [];
+var intersectionSphere;
 
 var interaction_server = io.connect('localhost:8080');
 
@@ -43,6 +40,11 @@ function initThree() {
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.top = '0px';
   stats.domElement.style.zIndex = 100;
+
+  var material = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.0} );
+  intersectionSphere = new THREE.Mesh( new THREE.SphereGeometry( 75, 10, 10 ), material );
+  intersectionSphere.position.set(0, 0, 0);
+  scene.add( intersectionSphere );
 
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
@@ -127,8 +129,6 @@ function addObject(objModel, position, up, front, RGBColor, objectGetter){
     
     scene.add( object );
 
-    objects.push( object );
-
     objectGetter(object);
   }, onProgress, onError );
 
@@ -149,17 +149,17 @@ function onWindowResize() {
 function onDocumentMouseDown( event ) {
   event.preventDefault();
 
-  console.log("Click");
-
   mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
   mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
 
   raycaster.setFromCamera( mouse, camera );
 
-  var intersects = raycaster.intersectObjects( objects, true );
+  var objects_intersect = [];
+  objects_intersect.push(intersectionSphere);
+  var intersects = raycaster.intersectObjects( objects_intersect, true );
 
   if ( intersects.length > 0 ) {
-    interaction_server.emit('interaction', (mouse.x).toString() + ',' + (mouse.y).toString() + ',' + '0');
+    interaction_server.emit('interaction', (intersects[0].point.x).toString() + ',' + (intersects[0].point.y).toString() + ',' + (intersects[0].point.z).toString());
   }
 }
 
