@@ -159,7 +159,7 @@ function onDocumentMouseDown( event ) {
   var intersects = raycaster.intersectObjects( objects, true );
 
   if ( intersects.length > 0 ) {
-    interaction_server.emit('interaction', (mouse.x).toString() + ',' + (mouse.y).toString());
+    interaction_server.emit('interaction', (mouse.x).toString() + ',' + (mouse.y).toString() + ',' + '0');
   }
 }
 
