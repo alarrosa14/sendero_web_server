@@ -8,16 +8,28 @@ var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
 function initThree() {
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setClearColor( 0x212121, 1);
+  renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setSize( window.innerWidth, window.innerHeight );
 
-  container = document.createElement( 'div' );
-  document.body.appendChild( container );
+  element = renderer.domElement;
+  container = document.getElementById( 'container' );
+  container.appendChild( element );
 
   camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-  camera.position.z = 100;
+  camera.position.z = 300;
 
   // orbits
-  controls = new THREE.OrbitControls( camera );
-  controls.damping = 0.2;
+  controls = new THREE.OrbitControls(camera, element);
+  /*controls.target.set(
+    camera.position.x + 0.1,
+    camera.position.y,
+    camera.position.z
+  );*/
+  controls.noZoom = true;
+  controls.noPan = true;
+
   controls.addEventListener( 'change', render );
 
   // scene
@@ -32,19 +44,11 @@ function initThree() {
   // scene.add( directionalLight );
 
 
-  renderer = new THREE.WebGLRenderer({ antialias: true, precision: 'highp', alpha: true });
-  renderer.setClearColor( 0x212121, 1);
-  renderer.setPixelRatio( window.devicePixelRatio );
-  renderer.setSize( window.innerWidth, window.innerHeight );
-  container.appendChild( renderer.domElement );
 
-  stats = new Stats();
-  stats.domElement.style.position = 'absolute';
-  stats.domElement.style.top = '0px';
-  stats.domElement.style.zIndex = 100;
-  //container.appendChild( stats.domElement );
 
   // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+  document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
   //
 
@@ -123,7 +127,7 @@ function addObject(objModel, position, up, front, RGBColor, objectGetter){
     
     object.setRotationFromQuaternion(qTot);
     
-    object.position.set(position.x,position.y,position.z);
+    object.position.set(position.x*1.1,position.y*1.1,position.z*1.1);
     
     scene.add( object );
 
@@ -145,6 +149,17 @@ function onWindowResize() {
 
 }
 
+
+function onDocumentTouchMove(ev) {
+
+  if (ev.targetTouches.length == 2) {   
+    server.emit('log', ev);
+    console.log("EL TOUCH", ev);
+  }
+
+}
+
+
 function onDocumentMouseMove( event ) {
 
   mouseX = ( event.clientX - windowHalfX ) / 2;
@@ -164,6 +179,5 @@ function animate() {
 function render() {
 
   renderer.render( scene, camera );
-  stats.update();
 
 }

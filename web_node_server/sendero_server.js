@@ -34,8 +34,8 @@ function publisher(conn, data) {
 
 // Process the event data 
 function process_data(data){
-	// Do processing...
-	return data;
+  // Do processing...
+  return data;
 }
 
 /***********************************************/
@@ -46,29 +46,36 @@ io.on('connection', function(client){
   console.log("Connected client...");
   console.log("EL CLIENTE: ", client);
 
-	/*
-	 * 
-	 */
-	client.on('sendFrame', function(data){
-		client.broadcast.emit('frame', data);
-	});
+  /*
+   * 
+   */
+  client.on('sendFrame', function(data){
+    client.broadcast.emit('frame', data);
+  });
 
-	/*
-	 * 
-	 */
-	client.on('interaction', function (data) {
-		console.log('Interaction', data);
+  /*
+   * 
+   */
 
-		// Process data
-		var processed_data = process_data(data)
+  
+  client.on('log', function(msj) {
+    console.log('Client log: ', msj);
+  });
 
-		// Insert into the queue
-		queue.connect('amqp://localhost', function(err, conn) {
-			if (err != null) bail(err);
-			publisher(conn,processed_data);      
-		});
-	});
-	
+
+  client.on('interaction', function (data) {
+    console.log('Interaction', data);
+
+    // Process data
+    var processed_data = process_data(data)
+
+    // Insert into the queue
+    queue.connect('amqp://localhost', function(err, conn) {
+      if (err != null) bail(err);
+      publisher(conn,processed_data);      
+    });
+  });
+  
 });
 
 app.get('/', function(req, res){
