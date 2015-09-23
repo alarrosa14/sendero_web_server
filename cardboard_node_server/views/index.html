@@ -22,7 +22,7 @@
   <body>
     <div id="example"></div>
 
-
+  <script src="underscore-min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <!-- <script src="three.min.js"></script> -->
   <script src="three.js"></script>
@@ -55,7 +55,7 @@
       server.on('frame', function(what){
         var bufView = new Uint8Array(what);
 
-        for (var i = 0; i < 3*90; i =  i + 3) {
+        for (var i = 0; i <= 3*90; i =  i + 3) {
           var R = bufView[i];
           var G = bufView[i+1];
           var B = bufView[i+2]; 
@@ -78,7 +78,8 @@
     }
 
     function init() {
-      renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+      renderer = new THREE.WebGLRenderer({antialias: true, sortObjects: false, alpha: true});
+      renderer.sortObjects = false;
       renderer.setClearColor( 0x212121 , 1);
       element = renderer.domElement;
       container = document.getElementById('example');
@@ -113,7 +114,7 @@
       };
 
       //To use enter the axis length
-      debugaxis(1000);
+      //debugaxis(1000);
 
 
       scene.add(play);
@@ -167,26 +168,28 @@
         specular: 0xffffff,
         shininess: 20,
         shading: THREE.FlatShading,
-        map: texture,
+        map: texture
       });
 
       var geometry = new THREE.PlaneGeometry(1000, 1000);
 
       var mesh = new THREE.Mesh(geometry, material);
       mesh.rotation.x = -Math.PI / 2;
-      mesh.position.set(0,-100,0);
+      mesh.position.set(0,-101,0);
 
-      mesh.renderDepth = 1000;
+      //mesh.renderDepth = 10000;
 
 
       //play.add(mesh);
-      scene.add(mesh);
+      //scene.add(mesh);
 
       window.addEventListener('resize', resize, false);
       setTimeout(resize, 1);
     }
 
-    function addObject(objModel, position, up, front, RGBColor, objectGetter){
+    //var i = 1;
+
+    function addObject(objModel, position, up, front, RGBColor, ID, objectGetter){
 
       var onProgress = function ( xhr ) {
       if ( xhr.lengthComputable ) {
@@ -218,36 +221,46 @@
 
         if ( child instanceof THREE.Mesh ) {
 
-          var material = new THREE.MeshBasicMaterial( { color: RGBColor, side : THREE.DoubleSide } );
-          child.material = material;
+            var material = new THREE.MeshBasicMaterial( { 
+              color: RGBColor,
+              side : THREE.DoubleSide
+            } );
 
-        }
+            child.material = material;
+            //child.material.renderDepth = i;
+            //child.renderDepth = i;
+            //console.log(child.renderDepth);
+            //i++;
 
-      } );
+          }
 
-      front = front.normalize();
-      up = up.normalize();
+        } );
 
-      var rotFront = new THREE.Matrix4();
+        front = front.normalize();
+        up = up.normalize();
 
-      var qFront = new THREE.Quaternion();
-      qFront.setFromUnitVectors(new THREE.Vector3(1,0,0),front);
+        var rotFront = new THREE.Matrix4();
 
-      var newSourceUp = new THREE.Vector3(0,0,1); // hardcoded
+        var qFront = new THREE.Quaternion();
+        qFront.setFromUnitVectors(new THREE.Vector3(1,0,0),front);
 
-      var qUp = new THREE.Quaternion();
-      qUp.setFromUnitVectors(newSourceUp,up);
+        var newSourceUp = new THREE.Vector3(0,0,1); // hardcoded
 
-      var qTot = qFront;
+        var qUp = new THREE.Quaternion();
+        qUp.setFromUnitVectors(newSourceUp,up);
 
-      object.setRotationFromQuaternion(qTot);
+        var qTot = qFront;
 
-      object.position.set(position.x,position.y,position.z);
+        object.setRotationFromQuaternion(qTot);
 
-      scene.add( object );
-      //play.add(object);
+        object.position.set(position.x*1.1,position.y*1.1,position.z*1.1);
 
-      objectGetter(object);
+        scene.add( object );
+        //play.add(object);
+
+        object.pixelId = ID;
+        objectGetter(object);
+        
       }, onProgress, onError );
 
       /////////////////////////////////////////
@@ -285,16 +298,18 @@
         console.log("adding pixel...");
         if (pixelsList.length == pixelsQty){
           console.log("calling callback");
+          pixelsList = _.sortBy(pixelsList, function(o){ return o.pixelId; });
           callBack(pixelsList);
         }
       }
 
       for (var i = 0; i < pixelsDoc.length; i++) {
 
-        var pixel = pixelsDoc[i]
-        var R = parseInt(pixel.getAttribute('r'))
-        var G = parseInt(pixel.getAttribute('g'))
-        var B = parseInt(pixel.getAttribute('b'))
+        var pixel = pixelsDoc[i];
+        var ID = parseInt(pixel.getAttribute('id'));
+        var R = parseInt(pixel.getAttribute('r'));
+        var G = parseInt(pixel.getAttribute('g'));
+        var B = parseInt(pixel.getAttribute('b'));
 
         var color = (R << 16) | (G << 8) | B;
 
@@ -319,7 +334,7 @@
         console.log('up ' + print(up));
         console.log('position ' + print(position));
 
-        addObject(objectModelName + '100.obj',position,up,front,color,loaderFunction);
+        addObject(objectModelName + '100.obj',position,up,front,color,ID,loaderFunction);
       };
     }
 
