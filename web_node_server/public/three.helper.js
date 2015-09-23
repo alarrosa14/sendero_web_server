@@ -9,19 +9,31 @@ var raycaster;
 var mouse;
 var intersectionSphere;
 
-var interaction_server = io.connect('localhost:8080');
+var interaction_server = io.connect('192.168.0.106:8080');
 
 function initThree() {
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setClearColor( 0x212121, 1);
+  renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setSize( window.innerWidth, window.innerHeight );
 
-  container = document.createElement( 'div' );
-  document.body.appendChild( container );
+  element = renderer.domElement;
+  container = document.getElementById( 'container' );
+  container.appendChild( element );
 
   camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-  camera.position.z = 100;
+  camera.position.z = 300;
 
   // orbits
-  controls = new THREE.OrbitControls( camera );
-  controls.damping = 0.2;
+  controls = new THREE.OrbitControls(camera, element);
+  /*controls.target.set(
+    camera.position.x + 0.1,
+    camera.position.y,
+    camera.position.z
+  );*/
+  controls.noZoom = true;
+  controls.noPan = true;
+
   controls.addEventListener( 'change', render );
 
   // scene
@@ -30,26 +42,16 @@ function initThree() {
   var ambient = new THREE.AmbientLight( 0x404040 );
   scene.add( ambient );
 
-  renderer = new THREE.WebGLRenderer({ antialias: true, precision: 'highp', alpha: true });
-  renderer.setClearColor( 0x212121, 1);
-  renderer.setPixelRatio( window.devicePixelRatio );
-  renderer.setSize( window.innerWidth, window.innerHeight );
-  container.appendChild( renderer.domElement );
-
-  stats = new Stats();
-  stats.domElement.style.position = 'absolute';
-  stats.domElement.style.top = '0px';
-  stats.domElement.style.zIndex = 100;
-
-  var material = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.0} );
+  var material = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.5} );
   intersectionSphere = new THREE.Mesh( new THREE.SphereGeometry( 75, 10, 10 ), material );
   intersectionSphere.position.set(0, 0, 0);
   scene.add( intersectionSphere );
 
+  document.addEventListener( 'touchmove', onDocumentTouchMove, false );
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
   
-  document.addEventListener( 'mousemove', onDocumentMouseDown, false );
+  // document.addEventListener( 'mousemove', onDocumentMouseDown, false );
 
   window.addEventListener( 'resize', onWindowResize, false );
 }
@@ -125,7 +127,7 @@ function addObject(objModel, position, up, front, RGBColor, ID, objectGetter){
     
     object.setRotationFromQuaternion(qTot);
     
-    object.position.set(position.x,position.y,position.z);
+    object.position.set(position.x*1.1,position.y*1.1,position.z*1.1);
     
     scene.add( object );
 
@@ -147,7 +149,39 @@ function onWindowResize() {
   renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
+
 var shouldSend = true;
+
+function onDocumentTouchMove(event) {
+  event.preventDefault();
+
+  // if (shouldSend){
+    mouse.x = ( event.touches[0].pageX / renderer.domElement.width ) * 2 - 1;
+    mouse.y = - ( event.touches[0].pageY / renderer.domElement.height ) * 2 + 1;
+
+
+    raycaster.setFromCamera( mouse, camera );
+
+    var objects_intersect = [];
+    objects_intersect.push(intersectionSphere);
+    var intersects = raycaster.intersectObjects( objects_intersect, true );
+
+    if ( intersects.length > 0 ) {
+      interaction_server.emit('interaction', (intersects[0].point.x).toString() + ',' + (intersects[0].point.y).toString() + ',' + (intersects[0].point.z).toString());
+      console.log((intersects[0].point.x).toString() + ',' + (intersects[0].point.y).toString() + ',' + (intersects[0].point.z).toString());
+    }else{
+      console.log('no macho!');
+    }
+
+    // shouldSend = false;
+
+  //   setTimeout(function(){
+  //     shouldSend = true;
+  //   },1000/24);
+  // }
+
+}
+
 function onDocumentMouseDown( event ) {
   event.preventDefault();
 
@@ -183,5 +217,4 @@ function animate() {
 function render() {
 
   renderer.render( scene, camera );
-  stats.update();
 }

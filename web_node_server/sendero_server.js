@@ -35,8 +35,8 @@ function publisher(conn, data) {
 
 // Process the event data 
 function process_data(data){
-	// Do processing...
-	return data;
+  // Do processing...
+  return data;
 }
 
 /***********************************************/
@@ -75,7 +75,6 @@ queue.connect('amqp://localhost', function(err, conn) {
 		});
 
 	});
-
 });
 
 app.get('/', function(req, res){

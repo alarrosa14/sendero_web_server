@@ -3,7 +3,7 @@
 
 <head>
 <title>Sendero Stream Client</title>
-
+<meta name="mobile-web-app-capable" content="yes">
 <style type="text/css">
 body{
   margin: 0px;
@@ -13,21 +13,21 @@ body{
 </head>
 
 <body>
+<div id="container"></div>
 </body>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="underscore-min.js"></script>
-<script src="three.min.js"></script>
-<script src="http://threejs.org/examples/js/loaders/OBJLoader.js"></script>
-<script src="http://threejs.org/examples/js/controls/OrbitControls.js"></script>
-<script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
+<script src="three.js"></script>
+<script src="OBJLoader.js"></script>
+<script src="orbitControls.js"></script>
 <script src="three.helper.js"></script>
 <script src="xml.parser.js"></script>
 
 <script>
 
 
-  var server = io.connect('localhost:8080');
+  var server = io.connect('192.168.0.106:8080');
 
   initThree();
 
