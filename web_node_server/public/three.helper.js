@@ -42,16 +42,15 @@ function initThree() {
   var ambient = new THREE.AmbientLight( 0x404040 );
   scene.add( ambient );
 
-  var material = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.5} );
-  intersectionSphere = new THREE.Mesh( new THREE.SphereGeometry( 75, 10, 10 ), material );
+  var material = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.0} );
+  intersectionSphere = new THREE.Mesh( new THREE.SphereGeometry( 84, 10, 10 ), material );
   intersectionSphere.position.set(0, 0, 0);
   scene.add( intersectionSphere );
 
-  document.addEventListener( 'touchmove', onDocumentTouchMove, false );
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
   
-  // document.addEventListener( 'mousemove', onDocumentMouseDown, false );
+  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
   window.addEventListener( 'resize', onWindowResize, false );
 }
@@ -152,37 +151,7 @@ function onWindowResize() {
 
 var shouldSend = true;
 
-function onDocumentTouchMove(event) {
-  event.preventDefault();
-
-  // if (shouldSend){
-    mouse.x = ( event.touches[0].pageX / renderer.domElement.width ) * 2 - 1;
-    mouse.y = - ( event.touches[0].pageY / renderer.domElement.height ) * 2 + 1;
-
-
-    raycaster.setFromCamera( mouse, camera );
-
-    var objects_intersect = [];
-    objects_intersect.push(intersectionSphere);
-    var intersects = raycaster.intersectObjects( objects_intersect, true );
-
-    if ( intersects.length > 0 ) {
-      interaction_server.emit('interaction', (intersects[0].point.x).toString() + ',' + (intersects[0].point.y).toString() + ',' + (intersects[0].point.z).toString());
-      console.log((intersects[0].point.x).toString() + ',' + (intersects[0].point.y).toString() + ',' + (intersects[0].point.z).toString());
-    }else{
-      console.log('no macho!');
-    }
-
-    // shouldSend = false;
-
-  //   setTimeout(function(){
-  //     shouldSend = true;
-  //   },1000/24);
-  // }
-
-}
-
-function onDocumentMouseDown( event ) {
+function onDocumentMouseMove( event ) {
   event.preventDefault();
 
   if (shouldSend){
