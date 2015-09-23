@@ -9,6 +9,7 @@ function loadPixelsFromXML(xmlPath, callBack){
 
   var pixelsList = [];
 
+
   if (window.XMLHttpRequest)
   {// code for IE7+, Firefox, Chrome, Opera, Safari
     xmlhttp=new XMLHttpRequest();
@@ -31,7 +32,12 @@ function loadPixelsFromXML(xmlPath, callBack){
   	pixelsList.push(object);
   	console.log("adding pixel...");
   	if (pixelsList.length == pixelsQty){
+
   		console.log("calling callback");
+
+      // order pixel objects by Id
+      pixelsList = _.sortBy(pixelsList, function(o){ return o.pixelId; });
+
   		callBack(pixelsList);
   	}
   }
@@ -39,6 +45,7 @@ function loadPixelsFromXML(xmlPath, callBack){
   for (var i = 0; i < pixelsDoc.length; i++) {
     
     var pixel = pixelsDoc[i]
+    var ID = parseInt(pixel.getAttribute('id'))
     var R = parseInt(pixel.getAttribute('r'))
     var G = parseInt(pixel.getAttribute('g'))
     var B = parseInt(pixel.getAttribute('b'))
@@ -61,12 +68,7 @@ function loadPixelsFromXML(xmlPath, callBack){
       return '(' + vect.x + ',' + vect.y + ',' + vect.z + ')';
     }
 
-    console.log('Pixel ' + i);
-    console.log('front ' + print(front));
-    console.log('up ' + print(up));
-    console.log('position ' + print(position));
-
-    addObject(objectModelName + '100.obj',position,up,front,color,loaderFunction);
+    addObject(objectModelName + '100.obj',position,up,front,color,ID,loaderFunction);
 
   };
 

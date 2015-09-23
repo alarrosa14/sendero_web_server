@@ -16,6 +16,7 @@ body{
 </body>
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="underscore-min.js"></script>
 <script src="three.min.js"></script>
 <script src="http://threejs.org/examples/js/loaders/OBJLoader.js"></script>
 <script src="http://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -26,7 +27,7 @@ body{
 <script>
 
 
-  var server = io.connect('http://alarrosa14.ddns.net:8080');
+  var server = io.connect('localhost:8080');
 
   initThree();
 
@@ -38,7 +39,7 @@ body{
     server.on('frame', function(what){
       var bufView = new Uint8Array(what);
       
-      for (var i = 0; i < 3*90; i =  i + 3) {
+      for (var i = 0; i <= 3*90; i =  i + 3) {
         var R = bufView[i];
         var G = bufView[i+1];
         var B = bufView[i+2]; 
@@ -51,23 +52,6 @@ body{
     
   });
 
-/*
-  document.body.style.backgroundColor= 'rgb(128,128,128)';
-  
-  server.on('frame', function(what){
-   var bufView = new Uint8Array(what);
-   var R = bufView[0];
-   var G = bufView[1];
-   var B = bufView[2];
-
-    document.body.style.backgroundColor= 'rgb(' + R + ',' + G + ',' + B + ')';
-   console.log(bufView);
-  });
-
-  function f(){
-   server.emit("sendFrame", "");
-  }
-*/
 </script>
 
 </html>

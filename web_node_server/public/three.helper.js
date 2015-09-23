@@ -49,7 +49,7 @@ function initThree() {
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
   
-  document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+  document.addEventListener( 'mousemove', onDocumentMouseDown, false );
 
   window.addEventListener( 'resize', onWindowResize, false );
 }
@@ -69,7 +69,7 @@ function changePixelColor(object,r,g,b){
   });
 }
 
-function addObject(objModel, position, up, front, RGBColor, objectGetter){
+function addObject(objModel, position, up, front, RGBColor, ID, objectGetter){
 
   var onProgress = function ( xhr ) {
     if ( xhr.lengthComputable ) {
@@ -129,6 +129,7 @@ function addObject(objModel, position, up, front, RGBColor, objectGetter){
     
     scene.add( object );
 
+    object.pixelId = ID;
     objectGetter(object);
   }, onProgress, onError );
 
@@ -146,21 +147,31 @@ function onWindowResize() {
   renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
+var shouldSend = true;
 function onDocumentMouseDown( event ) {
   event.preventDefault();
 
-  mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
-  mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+  if (shouldSend){
+    mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+    mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
 
-  raycaster.setFromCamera( mouse, camera );
+    raycaster.setFromCamera( mouse, camera );
 
-  var objects_intersect = [];
-  objects_intersect.push(intersectionSphere);
-  var intersects = raycaster.intersectObjects( objects_intersect, true );
+    var objects_intersect = [];
+    objects_intersect.push(intersectionSphere);
+    var intersects = raycaster.intersectObjects( objects_intersect, true );
 
-  if ( intersects.length > 0 ) {
-    interaction_server.emit('interaction', (intersects[0].point.x).toString() + ',' + (intersects[0].point.y).toString() + ',' + (intersects[0].point.z).toString());
+    if ( intersects.length > 0 ) {
+      interaction_server.emit('interaction', (intersects[0].point.x).toString() + ',' + (intersects[0].point.y).toString() + ',' + (intersects[0].point.z).toString());
+    }
+
+    shouldSend = false;
+
+    setTimeout(function(){
+      shouldSend = true;
+    },1000/24);
   }
+
 }
 
 function animate() {

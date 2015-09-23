@@ -16,6 +16,7 @@ require('socket.io-stream')(io);
 
 // Create queue
 var interactions_queue = 'interactions_queue';
+var connection_queue;
 
 function bail(err) {
   console.error(err);
@@ -41,34 +42,40 @@ function process_data(data){
 /***********************************************/
 /***************** MAIN ************************/
 /***********************************************/
-io.on('connection', function(client){
 
-  console.log("Connected client...");
-  console.log("EL CLIENTE: ", client);
+queue.connect('amqp://localhost', function(err, conn) {
 
-	/*
-	 * 
-	 */
-	client.on('sendFrame', function(data){
-		client.broadcast.emit('frame', data);
-	});
+	connection_queue = conn; 
 
-	/*
-	 * 
-	 */
-	client.on('interaction', function (data) {
-		console.log('Interaction', data);
+	io.on('connection', function(client){
 
-		// Process data
-		var processed_data = process_data(data)
+		console.log("Connected client...");
+		console.log("EL CLIENTE: ", client);
 
-		// Insert into the queue
-		queue.connect('amqp://localhost', function(err, conn) {
-			if (err != null) bail(err);
-			publisher(conn,processed_data);      
+		/*
+		* 
+		*/
+		client.on('sendFrame', function(data){
+			client.broadcast.emit('frame', data);
 		});
+
+		/*
+		* 
+		*/
+		client.on('interaction', function (data) {
+			console.log('Interaction', data);
+
+			// Process data
+			var processed_data = process_data(data)
+
+			// Insert into the queue
+
+			publisher(connection_queue,processed_data);      
+			
+		});
+
 	});
-	
+
 });
 
 app.get('/', function(req, res){
