@@ -1,11 +1,15 @@
 var container, stats;
-
 var camera, controls, scene, renderer;
-
-var mouseX = 0, mouseY = 0;
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
+
+/*** Intersection ***/
+var raycaster;
+var mouse;
+var intersectionSphere;
+
+var interaction_server = io.connect('localhost:8080');
 
 function initThree() {
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -33,27 +37,23 @@ function initThree() {
   controls.addEventListener( 'change', render );
 
   // scene
-
   scene = new THREE.Scene();
 
   var ambient = new THREE.AmbientLight( 0x404040 );
   scene.add( ambient );
 
-  // var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-  // directionalLight.position.set( 0, 0, 1 );
-  // scene.add( directionalLight );
-
-
-
-
-  // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  var material = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.0} );
+  intersectionSphere = new THREE.Mesh( new THREE.SphereGeometry( 75, 10, 10 ), material );
+  intersectionSphere.position.set(0, 0, 0);
+  scene.add( intersectionSphere );
 
   document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-
-  //
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+  
+  document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
   window.addEventListener( 'resize', onWindowResize, false );
-
 }
 
 function changePixelColor(object,r,g,b){
@@ -146,9 +146,7 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
 
   renderer.setSize( window.innerWidth, window.innerHeight );
-
 }
-
 
 function onDocumentTouchMove(ev) {
 
@@ -159,25 +157,30 @@ function onDocumentTouchMove(ev) {
 
 }
 
+function onDocumentMouseDown( event ) {
+  event.preventDefault();
 
-function onDocumentMouseMove( event ) {
+  mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+  mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
 
-  mouseX = ( event.clientX - windowHalfX ) / 2;
-  mouseY = ( event.clientY - windowHalfY ) / 2;
+  raycaster.setFromCamera( mouse, camera );
 
+  var objects_intersect = [];
+  objects_intersect.push(intersectionSphere);
+  var intersects = raycaster.intersectObjects( objects_intersect, true );
+
+  if ( intersects.length > 0 ) {
+    interaction_server.emit('interaction', (intersects[0].point.x).toString() + ',' + (intersects[0].point.y).toString() + ',' + (intersects[0].point.z).toString());
+  }
 }
-
-  //
 
 function animate() {
 
   requestAnimationFrame( animate );
   controls.update();
-
 }
 
 function render() {
 
   renderer.render( scene, camera );
-
 }
